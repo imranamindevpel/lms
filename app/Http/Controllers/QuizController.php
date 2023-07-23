@@ -46,11 +46,14 @@ class QuizController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'user_id' => 'required',
-            'quiz_date' => 'required|date',
-            'start_time' => 'required',
-            'finish_time' => 'required',
-            'break_allocation' => 'required|integer',
+            'course_id' => 'required',
+            'question' => 'required',
+            'option_a' => 'required',
+            'option_b' => 'required',
+            'option_c' => 'required',
+            'option_d' => 'required',
+            'correct_option' => 'required',
+            'total_marks' => 'required|integer',
         ]);
         $quiz = Quiz::create($validatedData);
         // log against this user's action
@@ -82,7 +85,7 @@ class QuizController extends Controller
      */
     public function edit(Quiz $quiz)
     {
-        $courseId = $quiz->user->courses[0]->id;
+        $courseId = $quiz->course_id;
         $userIds = UserCourse::where('course_id', $courseId)->pluck('user_id');
         $selected_course_users = User::where('role','student')->whereIn('id', $userIds)->get();
         
@@ -103,11 +106,14 @@ class QuizController extends Controller
     public function update(Request $request, quiz $quiz)
     {
         $validatedData = $request->validate([
-            'user_id' => 'required',
-            'quiz_date' => 'required|date',
-            'start_time' => 'required',
-            'finish_time' => 'required',
-            'break_allocation' => 'required|integer',
+            'course_id' => 'required',
+            'question' => 'required',
+            'option_a' => 'required',
+            'option_b' => 'required',
+            'option_c' => 'required',
+            'option_d' => 'required',
+            'correct_option' => 'required',
+            'total_marks' => 'required|integer',
         ]);
         $quiz->update($validatedData);
         // log against this user's action
@@ -188,7 +194,7 @@ class QuizController extends Controller
             $quiz->quiz_date = $row['quiz_date'];
             $quiz->start_time = $row['start_time'];
             $quiz->finish_time = $row['finish_time'];
-            $quiz->break_allocation = $row['break_allocation'];
+            $quiz->total_marks = $row['total_marks'];
             $quiz->created_at = now();
             $quiz->updated_at = now();
             $quiz->save();
@@ -200,41 +206,6 @@ class QuizController extends Controller
         return redirect()->back()->with('success', 'CSV file imported successfully.');
     }
 
-    public function ghost_hour(Request $request){
-        if($request['over_time'] != 0){
-            $currentDateTime = Carbon::now();
-            $clock_out = $currentDateTime->copy()->addMinutes($request['over_time']);
-            $quizData = [
-                'user_id' => $request['user_id'],
-                'quiz_date' => $currentDateTime,
-                'start_time' => $currentDateTime,
-                'finish_time' => $currentDateTime,
-                'break_allocation' => 0,
-                'clock_in' => $currentDateTime,
-                'clock_out' => $clock_out,
-                'ghost_quiz' => $currentDateTime,
-            ];
-            $quiz = Quiz::create($quizData);
-            // log against this user's action
-            $user = auth()->user();
-            Quiz::where('user_id', $request['user_id'])->whereNull('ghost_quiz')
-                ->update(['ghost_quiz' => Carbon::now()]);
-            $logData = [
-                'event' => 'Ghost Quiz Created Id: '.$quiz->id,
-                'user_id' => $user->id,
-                'who' => $user->name,
-                'when' => Carbon::now(),
-                'where' => 'QuizController@ghost_hour',
-                'how' => 'HTTP POST Request',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ];
-            $log = Log::create($logData);
-            return redirect()->back()->with('success', 'Ghost Quiz Created Successfully.');
-        }else{
-            return redirect()->back()->with('error', 'There no any Flatten Difference.');
-        }
-    }
     public function clock_in_out(Request $request){
         $currentTime = Carbon::now()->toDateString();
         $loggedInUserId = auth()->user()->id;

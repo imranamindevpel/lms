@@ -92,14 +92,6 @@
                                 </div>
                             </div>--}}
                             <div class="form-group">
-                                <label>Contract Hours per Week</label>
-                                <input type="number" class="form-control" min="1" name="working_hours" required placeholder="Enter Contract Hours per Week"/>
-                            </div>
-                            <div class="form-group">
-                                <label>Break Hours per Day</label>
-                                <input type="number" class="form-control" min="1" name="break_minutes" required placeholder="Enter Break Hours per Day"/>
-                            </div>
-                            <div class="form-group">
                                 <div>
                                     <button type="submit" class="btn btn-primary waves-effect waves-light">
                                         Submit

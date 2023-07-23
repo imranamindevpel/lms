@@ -29,8 +29,8 @@
                     @foreach ($course->users as $user)
                     @if($user->role === "student")
                     <h5 class="bg-secondary text-white text-center p-1">{{ $user->name }}</h5>
-                    <form action="{{ route('ghost_hour') }}" method="PUT">
-                        @csrf      
+                    {{-- <form action="{{ route('ghost_hour') }}" method="PUT">
+                        @csrf       --}}
                         <div class="row">
                             <div class="col-md-12 position-relative">     
                                 <table class="table table-striped table-bordered dt-responsive nowrap datatable" style="border-collapse: collapse; width: 100%;">
@@ -167,7 +167,7 @@
                                 @endif
                             </div>
                         </div>
-                    </form>
+                    {{-- </form> --}}
                     @endif
                     @endforeach
                 @endforeach

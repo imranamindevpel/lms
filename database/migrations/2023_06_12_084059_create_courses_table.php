@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('folder_id');
+            $table->text('folder_id')->nullable();
             $table->text('detail')->nullable();
             $table->timestamps();
         });

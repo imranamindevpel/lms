@@ -11,18 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quizzes', function (Blueprint $table) {
+        Schema::create('reports', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('course_id');
-            $table->text('question')->nullable();
-            $table->text('option_a');
-            $table->text('option_b');
-            $table->text('option_c');
-            $table->text('option_d');
-            $table->text('correct_option');
+            $table->date('quiz_date');
+            $table->datetime('clock_in')->nullable();
+            $table->datetime('clock_out')->nullable();
+            $table->integer('obtained_marks');
             $table->integer('total_marks');
+            $table->boolean('status')->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('quizzes');
+        Schema::dropIfExists('reports');
     }
 };

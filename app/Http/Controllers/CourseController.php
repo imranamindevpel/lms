@@ -37,6 +37,7 @@ class CourseController extends Controller
 
         $course = new Course();
         $course->name = $request->input('name');
+        $course->folder_id = $request->input('folder_id');
         $course->detail = $request->input('detail');
         $course->save();
 
@@ -63,6 +64,7 @@ class CourseController extends Controller
 
         $course = Course::findOrFail($id);
         $course->name = $request->input('name');
+        $course->folder_id = $request->input('folder_id');
         $course->detail = $request->input('detail');
         $course->save();
 

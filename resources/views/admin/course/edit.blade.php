@@ -35,6 +35,10 @@
                                 <input type="text" name="name" value="{{$course->name}}" class="form-control" required placeholder="Enter Course"/>
                             </div>
                             <div class="form-group">
+                                <label>Google Course Folder Id</label>
+                                <input type="text" name="folder_id" value="{{$course->folder_id}}" class="form-control" required placeholder="Enter Course"/>
+                            </div>
+                            <div class="form-group">
                                 <label>Extra Detail</label>
                                 <div>
                                     <textarea class="form-control" name="detail" value="{{$course->detail}}" rows="5">{{$course->detail}}</textarea>

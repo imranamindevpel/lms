@@ -28,11 +28,6 @@
                     <button type="button" class="btn btn-secondary waves-effect waves-light float-right" data-toggle="modal" data-target="#addQuizModal">
                         Add New Quiz
                     </button>
-                    <!-- Button to trigger the modal -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
-                        Upload CSV
-                    </button>
-                    <a  class="btn btn-secondary" href="{{ asset('quizzes.csv') }}" download>Download Sample Csv File</a>
                 </h4>     
                 <!-- Modal -->
                 <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
@@ -91,30 +86,40 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="finish_time">Select User</label>
                                         <select id="userDropdown" class="form-control hidden" name="user_id" required>
                                             <!-- Dynamically Populated Users -->
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="form-group">
-                                        <label for="quiz_date">Quiz Date</label>
-                                        <input type="date" class="form-control" id="quiz_date" name="quiz_date" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="start_time">Quiz Start Time</label>
-                                        <input type="time" class="form-control" id="start_time" name="start_time" required>
+                                        <label for="question">Qusetion</label>
+                                        <input type="question" class="form-control" id="question" name="question" required>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="finish_time">Quiz Finish Time</label>
-                                        <input type="time" class="form-control" id="finish_time" name="finish_time" required>
+                                        <label for="option_a">Option A</label>
+                                        <input type="text" class="form-control" id="option_a" name="option_a" required>
                                     </div>
-
                                     <div class="form-group">
-                                        <label for="break_allocation">Break Allocation</label>
-                                        <input type="number" class="form-control" min="0" id="break_allocation" name="break_allocation" required>
+                                        <label for="option_b">Option B</label>
+                                        <input type="text" class="form-control" id="option_b" name="option_b" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="option_c">Option C</label>
+                                        <input type="text" class="form-control" id="option_c" name="option_c" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="option_d">Option D</label>
+                                        <input type="text" class="form-control" id="option_d" name="option_d" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="correct_option">Correct Option</label>
+                                        <input type="text" class="form-control" id="correct_option" name="correct_option" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="total_marks">Total Marks</label>
+                                        <input type="number" class="form-control" min="0" id="total_marks" name="total_marks" required>
                                     </div>
 
                                     <button type="submit" class="btn btn-primary">Add Quiz</button>
@@ -129,24 +134,24 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Student</th>
-                                <th>Quiz Date</th>
-                                <th>Start Time</th>
-                                <th>Finish Time</th>
-                                <th>Break Allocation</th>
+                                <th>Question</th>
+                                <th>Option A</th>
+                                <th>Option B</th>
+                                <th>Option C</th>
+                                <th>Option D</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach ($course->users as $user)
-                            @foreach ($user->quizzes as $i => $quiz)
+                            @foreach ($course->quizzes as $i => $quiz)
                                 <tr>
                                     <td>{{++$i}}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $quiz->quiz_date }}</td>
-                                    <td>{{ $quiz->start_time }}</td>
-                                    <td>{{ $quiz->finish_time }}</td>
-                                    <td>{{ $quiz->break_allocation }}</td>
+                                    <td>{{ $quiz->question }}</td>
+                                    <td>{{ $quiz->option_a }}</td>
+                                    <td>{{ $quiz->option_b }}</td>
+                                    <td>{{ $quiz->option_c }}</td>
+                                    <td>{{ $quiz->option_d }}</td>
+                                    <td>{{ $quiz->total_marks }}</td>
                                     <td>
                                         <a href="{{ route('quizzes.edit', $quiz->id) }}" class="btn btn-primary">Edit</a>
                                         <form action="{{ route('quizzes.destroy', $quiz->id) }}" method="POST" style="display: inline-block">
@@ -157,7 +162,6 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        @endforeach
                         </tbody>
                     </table>
                 @endforeach

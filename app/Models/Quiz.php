@@ -11,7 +11,7 @@ class Quiz extends Model
     use SoftDeletes;
     use HasFactory;
     protected $fillable = [
-        'user_id','quiz_date','start_time','finish_time','break_allocation','clock_in','clock_out', 'ghost_quiz',
+        'course_id','question','option_a','option_b','option_c','option_d','correct_option', 'total_marks'
     ];
     public function user()
     {
@@ -20,5 +20,9 @@ class Quiz extends Model
     public function breaks()
     {
         return $this->hasMany(QuizBreaks::class);
+    }
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
     }
 }

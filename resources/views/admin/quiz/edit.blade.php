@@ -26,37 +26,38 @@
                                 <select class="form-control courseDropdown" name="course_id" required>
                                     <option value="">Select Course</option>
                                     @foreach ($courses as $course)
-                                    <option value="{{ $course->id }}" {{ ($quiz->user->courses[0]->id == $course->id) ? 'selected' : '' }}>{{ $course->name }}</option>
+                                    <option value="{{ $course->id }}" {{ ($quiz->course->id == $course->id) ? 'selected' : '' }}>{{ $course->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="finish_time">Select User</label>
-                                <select id="userDropdown" class="form-control hidden" name="user_id" value="{{$quiz->user_id}}" required>
-                                    @foreach ($selected_course_users as $user)
-                                    <option value="{{ $user->id }}" {{ ($user->id == $quiz->user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
-                                    @endforeach
-                                    <!-- Dynamically Populated Users -->
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="quiz_date">Quiz Date</label>
-                                <input type="date" class="form-control" id="quiz_date" name="quiz_date" value="{{$quiz->quiz_date}}" required>
+                                <label for="question">Qusetion</label>
+                                <input type="question" class="form-control" id="question" name="question" value="{{$quiz->question}}" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="start_time">Quiz Start Time</label>
-                                <input type="time" class="form-control" id="start_time" name="start_time" value="{{$quiz->start_time}}" required>
+                                <label for="option_a">Option A</label>
+                                <input type="text" class="form-control" id="option_a" name="option_a" value="{{$quiz->option_a}}" required>
                             </div>
-
                             <div class="form-group">
-                                <label for="finish_time">Quiz Finish Time</label>
-                                <input type="time" class="form-control" id="finish_time" name="finish_time" value="{{$quiz->finish_time}}" required>
+                                <label for="option_b">Option B</label>
+                                <input type="text" class="form-control" id="option_b" name="option_b" value="{{$quiz->option_b}}" required>
                             </div>
-
                             <div class="form-group">
-                                <label for="break_allocation">Break Allocation</label>
-                                <input type="number" class="form-control" min="0" id="break_allocation" name="break_allocation" value="{{$quiz->break_allocation}}" required>
+                                <label for="option_c">Option C</label>
+                                <input type="text" class="form-control" id="option_c" name="option_c" value="{{$quiz->option_c}}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="option_d">Option D</label>
+                                <input type="text" class="form-control" id="option_d" name="option_d" value="{{$quiz->option_d}}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="correct_option">Correct Option</label>
+                                <input type="text" class="form-control" id="correct_option" name="correct_option" value="{{$quiz->correct_option}}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="total_marks">Total Marks</label>
+                                <input type="number" class="form-control" min="0" id="total_marks" name="total_marks" value="{{$quiz->total_marks}}" required>
                             </div>
 
                             <button type="submit" class="btn btn-primary">Update Quiz</button>

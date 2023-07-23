@@ -47,8 +47,6 @@ class UserController extends Controller
         $user->password = bcrypt($request->input('password'));
         $user->role = $request->input('role');
         $user->course_ids = json_encode($request->input('course_ids'));
-        $user->working_hours = $request->input('working_hours');
-        $user->break_minutes = $request->input('break_minutes');
         $user->save();
         $courseIds = $request->input('course_ids');
         $user->courses()->attach($courseIds);
@@ -89,8 +87,6 @@ class UserController extends Controller
             $user->password = bcrypt($request->input('password'));
         }
         $user->role = $request->input('role');
-        $user->working_hours = $request->input('working_hours');
-        $user->break_minutes = $request->input('break_minutes');
         $user->save();
 
         $user->courses()->detach();

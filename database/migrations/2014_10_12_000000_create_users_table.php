@@ -19,8 +19,6 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->json('course_ids')->nullable();
-            $table->string('working_hours')->nullable();
-            $table->string('break_minutes')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

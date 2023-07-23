@@ -12,64 +12,67 @@
   <!-- Sidebar -->
   <div class="container-fluid">
     <div class="row">
-      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
         <div class="sidebar-sticky">
-            <!-- Logo-->
-            <div>
+            <!-- Logo -->
+            <div class="text-center py-3">
                 <a href="{{url('/home')}}" class="logo">
                     <img src="{{asset('assets/images/logo-light.png')}}" class="logo-lg" alt="" height="57">
                     <img src="{{asset('assets/images/logo-sm.png')}}" class="logo-sm" alt="" height="28">
                 </a>
                 {{-- config('app.name', 'Laravel') --}}
             </div>
-            <!-- End Logo-->
-            
+            <!-- End Logo -->
 
-        <ul class="nav flex-column">
-            <li class="dropdown">
-                <a href="" class="dropdown-toggle profile waves-effect waves-light" data-toggle="dropdown" aria-expanded="true">
-                    <span class="profile-username">
-                    {{ Auth::user()->name }} <span class="mdi mdi-chevron-down font-15"></span>
-                    </span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="javascript:void(0)" class="dropdown-item"> {{ Auth::user()->role }}</a></li>
-                    <li>
-                        <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault();
-                                        document.getElementById('logout-form').submit();">
-                        {{ __('Logout') }}
+            <ul class="nav flex-column">
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle waves-effect waves-light" data-toggle="dropdown" aria-expanded="true">
+                        <span class="profile-username">
+                            {{ Auth::user()->name }} <span class="mdi mdi-chevron-down font-15"></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="javascript:void(0)" class="dropdown-item"> {{ Auth::user()->role }}</a></li>
+                        <li>
+                            <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                {{ __('Logout') }}
+                            </a>
+                        </li>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/dashboard') }}" class="nav-link">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/lectures') }}" class="nav-link">Lectures</a>
+                </li>
+                @if(auth()->check() && (auth()->user()->role !== 'student'))
+                    <li class="nav-item">
+                        <a href="{{ url('/users') }}" class="nav-link">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/courses') }}" class="nav-link">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/quizzes') }}" class="nav-link">Quizzes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/logged_in_users') }}" class="nav-link">
+                            <i class="ti-home"></i>
+                            {{ auth()->user()->role === 'teacher' ? 'Approvals' : (auth()->user()->role === 'admin' ? 'Reports' : '') }}
                         </a>
                     </li>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                        @csrf
-                    </form>
-                </ul>
-            </li>
-            <li class="">
-                <a href="{{ url('/dashboard') }}">Dashboard</a>
-            </li>
-            @if(auth()->check() && (auth()->user()->role !== 'student'))
-                <li class="">
-                    <a href="{{ url('/users') }}">Users</a>
-                </li>
-                <li class="">
-                    <a href="{{ url('/courses') }}">Courses</a>
-                </li>
-                <li class="">
-                    <a href="{{ url('/quizzes') }}">Quizzes</a>
-                </li>
-                <li class="">
-                    <a href="{{ url('/logged_in_users') }}"><i class="ti-home"></i>
-                        {{ auth()->user()->role === 'teacher' ? 'Approvals' : (auth()->user()->role === 'admin' ? 'Reports' : '') }}
-                    </a>
-                </li>
-                <li class="">
-                    <a href="{{ url('/logs') }}">Logs</a>
-                </li>
-            @endif
-        </ul>
+                    <li class="nav-item">
+                        <a href="{{ url('/logs') }}" class="nav-link">Logs</a>
+                    </li>
+                @endif
+            </ul>
         </div>
-      </nav>
+    </nav>
+
 
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
         <div class="wrapper">
@@ -96,25 +99,25 @@
                     $(this).val(filteredValue);
                 });
                 // for edit case
-                var selectedRole = $('#role').val();
-                var courseSelect = $('#course');
+                // var selectedRole = $('#role').val();
+                // var courseSelect = $('#course');
                 
-                if (selectedRole === "teacher") {
-                    courseSelect.prop('multiple', true);
-                } else {
-                    courseSelect.prop('multiple', false);
-                }
-                // for create case
-                $('#role').change(function() {
-                    var selectedRole = $(this).val();
-                    var courseSelect = $('#course');
+                // if (selectedRole === "teacher") {
+                //     courseSelect.prop('multiple', true);
+                // } else {
+                //     courseSelect.prop('multiple', false);
+                // }
+                // // for create case
+                // $('#role').change(function() {
+                //     var selectedRole = $(this).val();
+                //     var courseSelect = $('#course');
 
-                    if (selectedRole === "teacher") {
-                        courseSelect.prop('multiple', true);
-                    } else {
-                        courseSelect.prop('multiple', false);
-                    }
-                });
+                //     if (selectedRole === "teacher") {
+                //         courseSelect.prop('multiple', true);
+                //     } else {
+                //         courseSelect.prop('multiple', false);
+                //     }
+                // });
                 // for getting course users
                 $('.courseDropdown').change(function () {
                     var courseId = $(this).val();
@@ -152,3 +155,17 @@
         </script>
 </body>
 </html>
+<style>
+/* Add hover effect to the sidebar items */
+.nav-sidebar li.nav-item:hover {
+    background-color: #f8f9fa; /* Change the background color on hover */
+}
+
+/* Add hover effect to the dropdown items */
+.nav-sidebar li.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    margin: 0;
+    opacity: 1;
+    visibility: visible;
+}
+</style>

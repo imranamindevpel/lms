@@ -24,7 +24,7 @@
     <div class="col-sm-6">
         <div class="card">
             <div class="card-body">
-                <h4 class="m-t-0 m-b-30">Add User</h4>
+                <h4 class="m-t-0 m-b-30">Add Course</h4>
                 <div class="row">
                     <div class="col-sm-12">
                         <form class="" action="{{ route('courses.store') }}" method="POST" enctype="multipart/form-data">
