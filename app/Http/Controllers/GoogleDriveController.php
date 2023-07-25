@@ -10,8 +10,8 @@ class GoogleDriveController extends Controller
 {
     public function index(Request $request)
     {
+        $folderId = $request->id;
         $folderId = '15vUtgKnFEzNbgw0TIujqcc59RsfSNZll';
-        // $folderId = $request->id;
         if($folderId == Null){
             if(Auth::user()->role_id === 3){
                 $folderId = env('GOOGLE_BEFRIENDER_FOLDER_ID');
@@ -32,18 +32,19 @@ class GoogleDriveController extends Controller
             'role' => 'reader',
             'emailAddress' => $email,
         ));
-        $createdPermission = $service->permissions->create($folderId, $permission);
-        $permissionId = $createdPermission->getId();
+        // $createdPermission = $service->permissions->create($folderId, $permission);
+        // $permissionId = $createdPermission->getId();
         // dd($permissionId);
         // $service->permissions->delete($folderId, '00919110220330500768');
         // dd($service);
+        // dd($folderId);
         $client->setScopes([Drive::DRIVE_READONLY]);
         $drive = new Drive($client);
         $response = $drive->files->listFiles([
             'q' => "'{$folderId}' in parents",
         ]);
         $files = $response->getFiles();
-        dd($files);
-        return view('file-manager', ['files' => $files]);
+        // dd($files);
+        return view('admin.google-file-manager', ['files' => $files]);
     }
 }

@@ -154,6 +154,10 @@ class QuizController extends Controller
         return redirect()->route('quizzes.index')->with('error', 'Quiz deleted successfully!');    
     }
 
+    public function startQuiz($id)
+    {
+        dd($id);
+    }
     public function get_course_users(Request $request){
         $course = Course::findOrFail($request['id']);
         $users = $course->users()->where('role', 'student')->get();

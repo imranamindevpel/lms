@@ -17,7 +17,7 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 <input type="hidden" id="studentStatus" value="{{$studentStatus}}">
-<form action="{{ route('quizzes.clock_in_out') }}" method="POST">
+{{-- <form action="{{ route('quizzes.clock_in_out') }}" method="POST">
 <div class="row">
     @csrf
     <div class="col-sm-6 col-xl-3">
@@ -25,7 +25,7 @@
         <button type="submit" class="btn btn-danger" id="clock_out" name="clock_out" value="1" disabled>Clock Out</button>
     </div>
 </div>
-</form>
+</form> --}}
 <div class="row mt-3">
     <div class="col-lg-12">
         <div class="card">
@@ -68,7 +68,7 @@
                                 <td>{{$report->obtained_marks}}</td>
                                 <td>{{$report->total_marks}}</td>
                                 <td>
-                                    <a href="{{ route('logged_in_users.show', $report->id) }}" class="btn btn-success">View</a>
+                                    <a href="{{ route('quizzes.start_quiz', $report->id) }}" class="btn btn-success">View</a>
                                 </td>
                             </tr>
                             @endif
