@@ -41,22 +41,18 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
+        $courseIds = $request->input('course_ids');
+        $email = $request->input('email');
         $user = new User();
         $user->name = $request->input('name');
-        $user->email = $request->input('email');
+        $user->email = $email;
         $user->password = bcrypt($request->input('password'));
         $user->role = $request->input('role');
-        $user->course_ids = json_encode($request->input('course_ids'));
         $user->save();
-        $courseIds = $request->input('course_ids');
-        $user->courses()->attach($courseIds);
-        
-        $email = $request->input('email');
-        $course = Course::where('id', 1)->get();
-        dd($course);
-        $folderId = '15vUtgKnFEzNbgw0TIujqcc59RsfSNZll';
-        $this->lectureFolderPermission($folderId, $email);
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        $createdPermission = $this->lectureFolderPermission($user, $courseIds, $email);
+        if($createdPermission){
+            return redirect()->route('users.index')->with('success', 'User created successfully.');
+        }
     }
 
     public function show(string $id)
@@ -108,18 +104,31 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
-    private function lectureFolderPermission($folderId, $email){
-        $client = new \Google_Client();
-        $client->setAuthConfig('../app/client_secret.json');
-        $client->refreshToken('1//047Se-3Lsa67CCgYIARAAGAQSNwF-L9IrX1lXz1B2C7tyU4fK2IYKOXidrdAOCFUkbYyiMu854Kd1_JRIFJhbLwSUv8vguHV9ZNE');
-        $client->setScopes(\Google_Service_Drive::DRIVE);
-        $client->setAccessType('offline');
-        $service = new \Google_Service_Drive($client);
-        $permission = new \Google_Service_Drive_Permission(array(
-            'type' => 'user',
-            'role' => 'reader',
-            'emailAddress' => $email,
-        ));
-        $service->permissions->create($folderId, $permission);
+    private function lectureFolderPermission($user, $courseIds, $email)
+    {
+        $folderIds = Course::whereIn('id', $courseIds)->pluck('folder_id');
+        $folderIdsArray = $folderIds->toArray();
+
+        foreach ($folderIdsArray as $key => $folderId) {
+            $client = new \Google_Client();
+            $client->setAuthConfig('../app/client_secret.json');
+            $client->refreshToken(env('GOOGLE_DRIVE_TOKEN'));
+            $client->setScopes(\Google_Service_Drive::DRIVE);
+            $client->setAccessType('offline');
+            $service = new \Google_Service_Drive($client);
+            $permission = new \Google_Service_Drive_Permission(array(
+                'type' => 'user',
+                'role' => 'reader',
+                'emailAddress' => $email,
+            ));
+            $createdPermission = $service->permissions->create($folderId, $permission);
+            $permissionId = $createdPermission->getId();
+            
+            $userCourse = new UserCourse();
+            $userCourse->user_id = $user->id;
+            $userCourse->course_id = $courseIds[$key];
+            $userCourse->permission_id = $permissionId;
+            $userCourse->save();
+        }
     }
 }

@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+  <!-- Add Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -43,11 +45,19 @@
                         </form>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ url('/dashboard') }}" class="nav-link">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ url('/lectures') }}" class="nav-link">Lectures</a>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="lecturesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Lectures
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="lecturesDropdown">
+                        @foreach(auth()->user()->courses as $course)
+                        <li>
+                            <a href="{{ route('lectures.folder_id', ['id' => $course->folder_id]) }}">
+                                {{ $course->name }}
+                            </a>
+                        </li>
+                        @endforeach
+                    </ul>
                 </li>
                 @if(auth()->check() && (auth()->user()->role !== 'student'))
                     <li class="nav-item">

@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserCourse extends Model
 {
-    protected $table = 'user_course';
     use HasFactory;
+    protected $table = 'user_course';
     protected $fillable = [
-        'user_id','course_id',
+        'user_id','course_id','permission_id',
     ];
 }
