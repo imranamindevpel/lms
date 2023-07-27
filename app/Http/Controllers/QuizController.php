@@ -157,8 +157,28 @@ class QuizController extends Controller
     public function startQuiz($id)
     {
         $courseId = Report::where('id',$id)->pluck('course_id');
-        $questions = Quiz::inRandomOrder()->where('course_id', $courseId)->take(20)->get();
+        $questions = Quiz::inRandomOrder()->where('course_id', $courseId)->take(env('MCQ_COUNT'))->get();
         return view('student.quiz', compact('questions'));
+    }
+    public function submit_quiz(Request $request)
+    {
+        $request->validate([
+            'answer' => 'required|array',
+        ]);
+        $quizData = $request->input('answer');
+        $questionIds = array_keys($quizData);
+        $correctAnswers = Quiz::whereIn('id', $questionIds)
+                               ->pluck('correct_option', 'id')
+                               ->toArray();
+        $numCorrectAnswers = 0;
+        foreach ($quizData as $questionId => $submittedAnswer) {
+            if (isset($correctAnswers[$questionId]) && $correctAnswers[$questionId] === $submittedAnswer) {
+                $numCorrectAnswers++;
+            }
+        }
+        $message = "You scored $numCorrectAnswers out of " . count($questionIds) . " attempted questions from Total ".env('MCQ_COUNT')." Questions!";
+        $request->session()->flash('success', $message);
+        return redirect('/dashboard');
     }
     public function get_course_users(Request $request){
         $course = Course::findOrFail($request['id']);

@@ -23,7 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/logs', LogController::class);
     Route::get('/lectures/{id}/folder_id', [GoogleDriveController::class, 'getCourseByFolderId'])->name('lectures.folder_id');
     Route::post('quizzes/handleUpload', [QuizController::class, 'handleUpload'])->name('quizzes.handleUpload');
-    Route::post('quizzes/clock_in_out', [QuizController::class, 'clock_in_out'])->name('quizzes.clock_in_out');
+    Route::post('quizzes/submit_quiz', [QuizController::class, 'submit_quiz'])->name('quizzes.submit_quiz');
     Route::get('/quizzes/{id}/start', [QuizController::class, 'startQuiz'])->name('quizzes.start_quiz');
     Route::post('/get_course_users', [QuizController::class, 'get_course_users'])->name('get_course_users');
 });
