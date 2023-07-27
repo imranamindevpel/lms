@@ -20,6 +20,7 @@
                 <h3 class="text-center">Multiple Choice Questions</h3>
                 <form action="{{ route('quizzes.submit_quiz') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="report_id" value="{{$id}}">
                     @foreach($questions as $key => $question)
                         <div class="col-md-12">
                             <h5>{{$key+1}}: {{ $question->question }}</h5>

@@ -158,13 +158,15 @@ class QuizController extends Controller
     {
         $courseId = Report::where('id',$id)->pluck('course_id');
         $questions = Quiz::inRandomOrder()->where('course_id', $courseId)->take(env('MCQ_COUNT'))->get();
-        return view('student.quiz', compact('questions'));
+        return view('student.quiz', compact('id','questions'));
     }
     public function submit_quiz(Request $request)
     {
         $request->validate([
+            'report_id' => 'required',
             'answer' => 'required|array',
         ]);
+        $reportId = $request->input('report_id');
         $quizData = $request->input('answer');
         $questionIds = array_keys($quizData);
         $correctAnswers = Quiz::whereIn('id', $questionIds)
@@ -176,7 +178,7 @@ class QuizController extends Controller
                 $numCorrectAnswers++;
             }
         }
-        $message = "You scored $numCorrectAnswers out of " . count($questionIds) . " attempted questions from Total ".env('MCQ_COUNT')." Questions!";
+        $message = "You scored $reportId out of " . count($questionIds) . " attempted questions from Total ".env('MCQ_COUNT')." Questions!";
         $request->session()->flash('success', $message);
         return redirect('/dashboard');
     }
