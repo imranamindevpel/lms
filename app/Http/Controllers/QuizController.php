@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quiz;
-use App\Models\QuizBreaks;
+use App\Models\Report;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\UserCourse;
@@ -156,7 +156,9 @@ class QuizController extends Controller
 
     public function startQuiz($id)
     {
-        dd($id);
+        $courseId = Report::where('id',$id)->pluck('course_id');
+        $questions = Quiz::inRandomOrder()->where('course_id', $courseId)->take(20)->get();
+        return view('student.quiz', compact('questions'));
     }
     public function get_course_users(Request $request){
         $course = Course::findOrFail($request['id']);

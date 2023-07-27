@@ -45,17 +45,26 @@
                         </form>
                     </ul>
                 </li>
+                @php
+               $user = auth()->user();
+               $courses = $user->courses;
+                if ($user && $user->role === 'admin') {
+                    $courses = \App\Models\Course::all(); // Replace '\App\Models\Course' with the actual namespace of your Course model
+                }
+                @endphp
                 <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" id="lecturesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Lectures
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="lecturesDropdown">
-                        @foreach(auth()->user()->courses as $course)
+                        @foreach($courses as $course)
+                        @if($course->folder_id)
                         <li>
                             <a href="{{ route('lectures.folder_id', ['id' => $course->folder_id]) }}">
                                 {{ $course->name }}
                             </a>
                         </li>
+                        @endif
                         @endforeach
                     </ul>
                 </li>
