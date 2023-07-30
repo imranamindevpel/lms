@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\Quiz;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -250,22 +251,15 @@ class DatabaseSeeder extends Seeder
 
         foreach ($users as $user) {
             foreach ($courses as $course) {
-                $quizDate = now();
-                $clockIn = now();
-                $clockOut = now();
-
-                $obtainedMarks = $faker->numberBetween(0, 100);
-                $totalMarks = 100;
-
                 DB::table('reports')->insert([
                     'user_id' => $user->id,
                     'course_id' => $course->id,
-                    'quiz_date' => $quizDate,
-                    'clock_in' => $clockIn,
-                    'clock_out' => $clockOut,
-                    'obtained_marks' => $obtainedMarks,
-                    'total_marks' => $totalMarks,
-                    'status' => $obtainedMarks >= 50, // Set status based on obtained marks (true if passed, false if failed).
+                    'quiz_date' => Carbon::now(),
+                    'clock_in' => NULL,
+                    'clock_out' => NULL,
+                    'obtained_marks' => NULL,
+                    'total_marks' => NULL,
+                    'status' => NULL, // Set status based on obtained marks (true if passed, false if failed).
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

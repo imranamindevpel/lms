@@ -178,7 +178,28 @@ class QuizController extends Controller
                 $numCorrectAnswers++;
             }
         }
-        $message = "You scored $reportId out of " . count($questionIds) . " attempted questions from Total ".env('MCQ_COUNT')." Questions!";
+        $halfMCQCount = intval(env('MCQ_COUNT')) / 2;
+        $status = ($numCorrectAnswers >= $halfMCQCount) ? 1 : 0;
+
+        $report = Report::find($reportId);
+        $report->quiz_date = Carbon::now();
+        $report->clock_in = Carbon::now();
+        $report->clock_out = Carbon::now();
+        $report->obtained_marks = $numCorrectAnswers;
+        $report->total_marks = env('MCQ_COUNT');
+        $report->status = $status;
+        $report->save();
+
+        $now = Carbon::now();
+        $nextDate = $now->copy()->addDays(env('QUIZ_AFTER_DAYS'));
+        if($status == 0){
+            $userQuiz = new Report();
+            $userQuiz->user_id = $report->user_id;
+            $userQuiz->course_id = $report->course_id;
+            $userQuiz->quiz_date = $nextDate;
+            $userQuiz->save();
+        }
+        $message = "You scored $numCorrectAnswers out of " . count($questionIds) . " attempted questions from Total ".env('MCQ_COUNT')." Questions!";
         $request->session()->flash('success', $message);
         return redirect('/dashboard');
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\UserCourse;
+use App\Models\Report;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -49,7 +50,7 @@ class UserController extends Controller
         $user->password = bcrypt($request->input('password'));
         $user->role = $request->input('role');
         $user->save();
-        $createdPermission = $this->lectureFolderPermission($user, $courseIds, $email);
+        $createdPermission = $this->lectureFolderPermission($user, $courseIds, $email, $request->input('quiz_date'));
         if($createdPermission){
             return redirect()->route('users.index')->with('success', 'User created successfully.');
         }
@@ -104,7 +105,7 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
-    private function lectureFolderPermission($user, $courseIds, $email)
+    private function lectureFolderPermission($user, $courseIds, $email, $quizDate)
     {
         $folderIds = Course::whereIn('id', $courseIds)->pluck('folder_id');
         $folderIdsArray = $folderIds->toArray();
@@ -129,6 +130,11 @@ class UserController extends Controller
             $userCourse->course_id = $courseIds[$key];
             $userCourse->permission_id = $permissionId;
             $userCourse->save();
+            $userQuiz = new Report();
+            $userQuiz->user_id = $user->id;
+            $userQuiz->course_id = $courseIds[$key];
+            $userQuiz->quiz_date = $quizDate;
+            $userQuiz->save();
         }
     }
 }

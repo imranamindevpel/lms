@@ -8,7 +8,6 @@ use App\Models\Course;
 use App\Models\UserCourse;
 use App\Models\Quiz;
 use App\Models\Report;
-use App\Models\QuizBreaks;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -32,52 +31,49 @@ class DashboardController extends Controller
 
         $currentTime = Carbon::now()->toDateString();
         $loggedInUserId = auth()->user()->id;
-        $studentStatus = 0;
         
-        $userQuiz = Report::where('user_id', $loggedInUserId)->where('quiz_date', $currentTime)
-                            ->whereNull('clock_out')->get();
-        if(count($userQuiz) > 0){
-            // userClockedIn
-            $quizId = Report::where('quiz_date', $currentTime)->where('user_id', $loggedInUserId)
-            ->whereNotNull('clock_in')->whereNull('clock_out')->value('id');
-            if($quizId){$studentStatus = "userClockedIn";};
+        // if(count($userQuiz) > 0){
+        //     // userClockedIn
+        //     $quizId = Report::where('quiz_date', $currentTime)->where('user_id', $loggedInUserId)
+        //     ->whereNotNull('clock_in')->whereNull('clock_out')->value('id');
+        //     if($quizId){$studentStatus = "userClockedIn";};
             
-            // userStartedBreak
-            $quizId = Report::where('user_id', $loggedInUserId)
-            ->whereNotNull('clock_in')->whereNull('clock_out')
-            ->value('id');
-            // In case of clockIn & no break, its finding null quizzes thatswhy needed to check, if clockIn and quizzes exist.
-            $quizBreaksExist = QuizBreaks::where('quiz_id', $quizId)->get();
-            if(count($quizBreaksExist) > 0){
-                $quizBreaks = QuizBreaks::where('quiz_id', $quizId)
-                ->whereNotNull('start_break')->orderBy('id', 'desc')
-                ->value('end_break');
-                if($quizBreaks === null){$studentStatus = "userStartedBreak";};
-            }
+        //     // userStartedBreak
+        //     $quizId = Report::where('user_id', $loggedInUserId)
+        //     ->whereNotNull('clock_in')->whereNull('clock_out')
+        //     ->value('id');
+        //     // In case of clockIn & no break, its finding null quizzes thatswhy needed to check, if clockIn and quizzes exist.
+        //     $quizBreaksExist = QuizBreaks::where('quiz_id', $quizId)->get();
+        //     if(count($quizBreaksExist) > 0){
+        //         $quizBreaks = QuizBreaks::where('quiz_id', $quizId)
+        //         ->whereNotNull('start_break')->orderBy('id', 'desc')
+        //         ->value('end_break');
+        //         if($quizBreaks === null){$studentStatus = "userStartedBreak";};
+        //     }
             
-            // userEndedBreak
-            $quizId = Report::where('user_id', $loggedInUserId)
-            ->whereNotNull('clock_in')->whereNull('clock_out')
-            ->value('id');
-            $quizBreaks = QuizBreaks::where('quiz_id', $quizId)
-            ->whereNotNull('start_break')->orderBy('id', 'desc')
-            ->value('end_break');
-            if($quizBreaks !== null){$studentStatus = "userEndedBreak";};
+        //     // userEndedBreak
+        //     $quizId = Report::where('user_id', $loggedInUserId)
+        //     ->whereNotNull('clock_in')->whereNull('clock_out')
+        //     ->value('id');
+        //     $quizBreaks = QuizBreaks::where('quiz_id', $quizId)
+        //     ->whereNotNull('start_break')->orderBy('id', 'desc')
+        //     ->value('end_break');
+        //     if($quizBreaks !== null){$studentStatus = "userEndedBreak";};
             
-            // userClockedOut
-            $quizId = Report::where('user_id', $loggedInUserId)
-            ->whereNotNull('clock_in')->whereNotNull('clock_out')
-            ->value('id');
-            $quizBreaks = QuizBreaks::where('quiz_id', $quizId)
-            ->whereNotNull('start_break')->whereNotNull('end_break')
-            ->value('id');
-            if($quizBreaks){$studentStatus = "userClockedOut";};
+        //     // userClockedOut
+        //     $quizId = Report::where('user_id', $loggedInUserId)
+        //     ->whereNotNull('clock_in')->whereNotNull('clock_out')
+        //     ->value('id');
+        //     $quizBreaks = QuizBreaks::where('quiz_id', $quizId)
+        //     ->whereNotNull('start_break')->whereNotNull('end_break')
+        //     ->value('id');
+        //     if($quizBreaks){$studentStatus = "userClockedOut";};
 
-        }else{
-            $studentStatus = "userNoQuiz"; 
-        }
+        // }else{
+        //     $studentStatus = "userNoQuiz"; 
+        // }
         $courseIds = UserCourse::where('user_id', $user->id)->pluck('course_id');
         $courses = Course::whereIn('id', $courseIds)->get();
-        return view('student.index',compact('studentStatus', 'courses'));
+        return view('student.index',compact('courses'));
     }
 }

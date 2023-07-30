@@ -58,9 +58,9 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="lecturesDropdown">
                         @foreach($courses as $course)
-                        @if($course->folder_id)
+                        @if($course->name)
                         <li>
-                            <a href="{{ route('lectures.folder_id', ['id' => $course->folder_id]) }}">
+                            <a href="{{ route('lectures.folder_id', ['id' => $course->name]) }}">
                                 {{ $course->name }}
                             </a>
                         </li>
