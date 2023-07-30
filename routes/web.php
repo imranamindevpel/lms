@@ -27,7 +27,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/quizzes/{id}/start', [QuizController::class, 'startQuiz'])->name('quizzes.start_quiz');
     Route::post('/get_course_users', [QuizController::class, 'get_course_users'])->name('get_course_users');
 });
-
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
