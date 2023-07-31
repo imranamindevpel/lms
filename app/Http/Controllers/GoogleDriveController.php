@@ -11,10 +11,10 @@ class GoogleDriveController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $folderName = $request->id;
-        if($folderName == Null){
+        $folderId = $request->id;
+        if($folderId == Null){
             if($user->courses[0]->name){
-                $folderName = $user->courses[0]->name;
+                $folderId = $user->courses[0]->folder_id;
             }
         }
         $client = new \Google_Client();
@@ -24,7 +24,8 @@ class GoogleDriveController extends Controller
         $client->setScopes([Drive::DRIVE_READONLY]);
         $drive = new Drive($client);
         $response = $drive->files->listFiles([
-                'q' => "mimeType='application/vnd.google-apps.folder' and name='{$folderName}'",
+                // 'q' => "mimeType='application/vnd.google-apps.folder' and name='{$folderName}'",
+                'q' => "'{$folderId}' in parents",
         ]);
         $files = $response->getFiles();
         return view('admin.google-file-manager', ['files' => $files]);

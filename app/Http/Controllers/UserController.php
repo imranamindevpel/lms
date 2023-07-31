@@ -107,10 +107,17 @@ class UserController extends Controller
     }
     private function lectureFolderPermission($user, $courseIds, $email, $quizDate)
     {
-        $folderIds = Course::whereIn('id', $courseIds)->pluck('folder_id');
-        $folderIdsArray = $folderIds->toArray();
-
-        foreach ($folderIdsArray as $key => $folderId) {
+        $folderNames = Course::whereIn('id', $courseIds)->pluck('name');
+        $folderNamesArray = $folderNames->toArray();
+        foreach ($folderNamesArray as $key => $folderName) {
+            $folderId = null;
+            $folders = $service->files->listFiles(array('q' => "name = '$folderName'"));
+            foreach ($folders->getFiles() as $file) {
+                if ($file->getName() === $folderName) {
+                    $folderId = $file->getId();
+                    break;
+                }
+            }
             $client = new \Google_Client();
             $client->setAuthConfig('../app/client_secret.json');
             $client->refreshToken(env('GOOGLE_DRIVE_TOKEN'));
@@ -122,6 +129,7 @@ class UserController extends Controller
                 'role' => 'reader',
                 'emailAddress' => $email,
             ));
+            dd($folderId, $permission);
             $createdPermission = $service->permissions->create($folderId, $permission);
             $permissionId = $createdPermission->getId();
             
