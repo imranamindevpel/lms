@@ -111,25 +111,26 @@ class UserController extends Controller
         $folderNamesArray = $folderNames->toArray();
         foreach ($folderNamesArray as $key => $folderName) {
             $folderId = null;
-            $folders = $service->files->listFiles(array('q' => "name = '$folderName'"));
-            foreach ($folders->getFiles() as $file) {
-                if ($file->getName() === $folderName) {
-                    $folderId = $file->getId();
-                    break;
-                }
-            }
             $client = new \Google_Client();
             $client->setAuthConfig('../app/client_secret.json');
             $client->refreshToken(env('GOOGLE_DRIVE_TOKEN'));
             $client->setScopes(\Google_Service_Drive::DRIVE);
             $client->setAccessType('offline');
             $service = new \Google_Service_Drive($client);
+            $folders = $service->files->listFiles(array(
+                'q' => "mimeType='application/vnd.google-apps.folder' and name='{$folderName}'"
+            ));
+            foreach ($folders->getFiles() as $file) {
+                if ($file->getName() === $folderName) {
+                    $folderId = $file->getId();
+                    break;
+                }
+            }
             $permission = new \Google_Service_Drive_Permission(array(
                 'type' => 'user',
                 'role' => 'reader',
                 'emailAddress' => $email,
             ));
-            dd($folderId, $permission);
             $createdPermission = $service->permissions->create($folderId, $permission);
             $permissionId = $createdPermission->getId();
             

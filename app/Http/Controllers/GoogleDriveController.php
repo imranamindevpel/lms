@@ -46,7 +46,7 @@ class GoogleDriveController extends Controller
         $client->setScopes([Drive::DRIVE_READONLY]);
         $drive = new Drive($client);
         $response = $drive->files->listFiles([
-                'q' => "mimeType='application/vnd.google-apps.folder' and name='{$folderName}'",
+            'q' => "mimeType='application/vnd.google-apps.folder' and name='{$folderName}'",
         ]);
         $files = $response->getFiles();
         return view('admin.google-file-manager', ['files' => $files]);
