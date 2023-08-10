@@ -80,7 +80,7 @@
 </html>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+{{-- <script>
     $(document).ready(function() {
     $('#email').on('input', function() {
         var inputValue = $(this).val();
@@ -88,4 +88,4 @@
         $(this).val(filteredValue);
     });
     });
-</script>
+</script> --}}

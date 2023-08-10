@@ -14,8 +14,8 @@ Home Page
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-                <h1>File Manager</h1>
-                <div class="row">
+                <h1 class="text-center mb-4">Lectures</h1>
+                <div class="row justify-content-center">
                     @foreach ($files as $file)
                         @php
                             $fileId = $file->getId();
@@ -31,21 +31,23 @@ Home Page
                             $fileUrl = "https://drive.google.com/uc?export=download&id={$fileId}";
                         @endphp
 
-                        <div class="col-md-2">
-                                @if (strpos($mimeType, 'application/vnd.google-apps.folder') === 0)
-                                <a href="{{$folderUrl}}" class="file-item-name shadow-sm d-flex flex-column align-items-center text-center">
-                                    <div class="file-item-icon far fa-folder text-secondary"></div>
-                                @elseif (strpos($mimeType, 'image/') === 0)
-                                <a href="{{$imageUrl}}" class="file-item-name shadow-sm d-flex flex-column align-items-center text-center" target="_blank">
-                                    <div class="file-item-img" style="background-image: url({{$imageUrl}});"></div>
-                                @elseif (strpos($mimeType, 'video/') === 0)
-                                <a href="{{$videoUrl}}" class="file-item-name shadow-sm d-flex flex-column align-items-center text-center" target="_blank">
-                                    <div class="file-item-icon far fa-file-video text-secondary"></div>
-                                @else
-                                <a href="{{$fileUrl}}" class="file-item-name shadow-sm d-flex flex-column align-items-center text-center" target="_blank" download="download">
-                                    <div class="file-item-icon far fa-file text-secondary"></div>
-                                @endif
-                                <span class="file-name">{{$file->getName()}}</span>
+                        <div class="col-md-3 mb-4">
+                            <a href="{{ $mimeType === 'application/vnd.google-apps.folder' ? $folderUrl : ($mimeType === 'image/' ? $imageUrl : ($mimeType === 'video/' ? $videoUrl : $fileUrl)) }}"
+                               class="file-item-name shadow-sm d-flex flex-column align-items-center text-center" 
+                               target="{{ $mimeType === 'image/' || $mimeType === 'video/' ? '_blank' : '' }}"
+                               {{ $mimeType !== 'application/vnd.google-apps.folder' ? 'download="download"' : '' }}>
+                                <div class="file-item-icon">
+                                    @if ($mimeType === 'application/vnd.google-apps.folder')
+                                        <i class="far fa-folder text-secondary"></i>
+                                    @elseif ($mimeType === 'image/')
+                                        <div class="file-item-img" style="background-image: url('{{ $imageUrl }}');"></div>
+                                    @elseif ($mimeType === 'video/')
+                                        <i class="far fa-file-video text-secondary"></i>
+                                    @else
+                                        <i class="far fa-file text-secondary"></i>
+                                    @endif
+                                </div>
+                                <span class="file-name">{{ $file->getName() }}</span>
                             </a>
                         </div>
                     @endforeach
@@ -66,7 +68,7 @@ Home Page
         text-overflow: ellipsis;
         max-width: 100%;
     }
-    .file-item-img{
+    .file-item-img {
         background-color: transparent;
         background-position: center center;
         background-size: cover;
@@ -76,26 +78,30 @@ Home Page
         height: 4rem;
         font-size: 2.5rem;
         line-height: 4rem;
+        border-radius: 50%;
     }
-    .file-item-icon{
-        display: block;
+    .file-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         margin: 0 auto 0.75rem auto;
         width: 4rem;
         height: 4rem;
         font-size: 2.5rem;
         line-height: 4rem;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .file-item-icon i {
+        color: #6c757d;
+    }
+    .file-item-name {
+        text-decoration: none;
+        color: #212529;
+        transition: transform 0.2s ease-in-out;
+    }
+    .file-item-name:hover {
+        transform: scale(1.05);
     }
 </style>
-{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css" integrity="sha512-0/rEDduZGrqo4riUlwqyuHDQzp2D1ZCgH/gFIfjMIL5az8so6ZiXyhf1Rg8i6xsjv+z/Ubc4tt1thLigEcu6Ug==" crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
-{{-- <div class="file-item-icon far fa-folder text-secondary">
-<div class="file-item-img" style="background-image: url(https://bootdey.com/img/Content/avatar/avatar1.png);"></div>
-<div class="file-item-icon far fa-file-word text-secondary">
-<div class="file-item-icon far fa-file-pdf text-secondary">
-<div class="file-item-icon far fa-file-audio text-secondary">
-<div class="file-item-icon far fa-file-video text-secondary">
-<div class="file-item-icon far fa-file-archive text-secondary">
-<div class="file-item-icon far fa-file-alt text-secondary"></div>
-<div class="file-item-icon fab fa-js text-secondary"></div>
-<div class="file-item-icon fab fa-html5 text-secondary"></div>
-<div class="file-item-icon fab fa-css3 text-secondary"></div> --}}

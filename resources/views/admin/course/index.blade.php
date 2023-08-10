@@ -26,7 +26,7 @@
                 <h4 class="m-b-30 m-t-0">
                     Courses
                     @if(auth()->check() && (auth()->user()->role === 'admin'))
-                    <a href="{{ route('courses.create') }}" class="btn btn-secondary waves-effect waves-light float-right">
+                    <a href="{{ route('courses.create') }}" class="btn btn-secondary waves-effect waves-light float-right mb-2">
                         Add Course
                     </a>
                     @endif
@@ -50,11 +50,11 @@
                                 <td>{{ $course->created_at }}</td>
                                 @if(auth()->check() && (auth()->user()->role === 'admin'))
                                 <td>
-                                    <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-primary">Edit</a>
+                                    <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                                     <form action="{{ route('courses.destroy', $course->id) }}" method="POST" style="display: inline-block">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this course?')">Delete</button>
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this course?')"><i class="fas fa-trash-alt"></i></button>
                                     </form>
                                 </td>
                                 @endif

@@ -18,9 +18,9 @@ return new class extends Migration
             $table->date('quiz_date');
             $table->datetime('clock_in')->nullable();
             $table->datetime('clock_out')->nullable();
-            $table->integer('obtained_marks');
-            $table->integer('total_marks');
-            $table->boolean('status')->default(0);
+            $table->integer('obtained_marks')->nullable();
+            $table->integer('total_marks')->nullable();
+            $table->boolean('status')->nullable();
             $table->timestamps();
         });
     }

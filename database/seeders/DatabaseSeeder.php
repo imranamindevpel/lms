@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\Quiz;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -47,7 +48,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'student@gmail.com',
             'password' => bcrypt('password'),
         ]);
-        User::factory()->count(3)->create();
 
         $courseNames = ['Html', 'CSS', 'Javascript', 'Php', 'Laravel'];
         foreach ($courseNames as $name) {
@@ -58,15 +58,15 @@ class DatabaseSeeder extends Seeder
         }
         $courses = Course::all();
         
-        User::where('role', 'teacher')->get()->each(function ($user) use ($courses) {
-            $randomCourses = $courses->random(rand(1, $courses->count()));
-            $user->courses()->attach($randomCourses);
-        });
+        // User::where('role', 'teacher')->get()->each(function ($user) use ($courses) {
+        //     $randomCourses = $courses->random(rand(1, $courses->count()));
+        //     $user->courses()->attach($randomCourses);
+        // });
         
-        User::where('role', 'student')->get()->each(function ($teacher) use ($courses) {
-            $randomCourse = $courses->random();
-            $teacher->courses()->attach($randomCourse);
-        });
+        // User::where('role', 'student')->get()->each(function ($teacher) use ($courses) {
+        //     $randomCourse = $courses->random();
+        //     $teacher->courses()->attach($randomCourse);
+        // });
         
         // $faker = Faker::create();
         // for ($i = 0; $i < 10; $i++) {
@@ -250,22 +250,15 @@ class DatabaseSeeder extends Seeder
 
         foreach ($users as $user) {
             foreach ($courses as $course) {
-                $quizDate = now();
-                $clockIn = now();
-                $clockOut = now();
-
-                $obtainedMarks = $faker->numberBetween(0, 100);
-                $totalMarks = 100;
-
                 DB::table('reports')->insert([
                     'user_id' => $user->id,
                     'course_id' => $course->id,
-                    'quiz_date' => $quizDate,
-                    'clock_in' => $clockIn,
-                    'clock_out' => $clockOut,
-                    'obtained_marks' => $obtainedMarks,
-                    'total_marks' => $totalMarks,
-                    'status' => $obtainedMarks >= 50, // Set status based on obtained marks (true if passed, false if failed).
+                    'quiz_date' => Carbon::now(),
+                    'clock_in' => NULL,
+                    'clock_out' => NULL,
+                    'obtained_marks' => NULL,
+                    'total_marks' => NULL,
+                    'status' => NULL, // Set status based on obtained marks (true if passed, false if failed).
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

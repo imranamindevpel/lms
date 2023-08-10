@@ -28,41 +28,7 @@
                     <button type="button" class="btn btn-secondary waves-effect waves-light float-right" data-toggle="modal" data-target="#addQuizModal">
                         Add New Quiz
                     </button>
-                </h4>     
-                <!-- Modal -->
-                <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="uploadModalLabel">Upload CSV</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <form action="{{ route('quizzes.handleUpload') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label for="finish_time">Select Course</label>
-                                        <select class="form-control courseDropdown" name="course_id" required>
-                                            <option value="">Select Course</option>
-                                            @foreach ($courses as $course)
-                                                <option value="{{ $course->id }}">{{ $course->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="csv_file">CSV File</label>
-                                        <input type="file" class="form-control-file" id="csv_file" name="csv_file" required>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary" id="uploadBtn">Upload</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                </h4> 
                 <!-- Add Quiz Modal -->
                 <div class="modal fade" id="addQuizModal" tabindex="-1" role="dialog" aria-labelledby="addQuizModalLabel"
                     aria-hidden="true">
@@ -86,12 +52,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    {{-- <div class="form-group">
-                                        <label for="finish_time">Select User</label>
-                                        <select id="userDropdown" class="form-control hidden" name="user_id" required>
-                                            <!-- Dynamically Populated Users -->
-                                        </select>
-                                    </div> --}}
                                     <div class="form-group">
                                         <label for="question">Qusetion</label>
                                         <input type="question" class="form-control" id="question" name="question" required>
@@ -139,6 +99,7 @@
                                 <th>Option B</th>
                                 <th>Option C</th>
                                 <th>Option D</th>
+                                <th>Total</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -153,11 +114,11 @@
                                     <td>{{ $quiz->option_d }}</td>
                                     <td>{{ $quiz->total_marks }}</td>
                                     <td>
-                                        <a href="{{ route('quizzes.edit', $quiz->id) }}" class="btn btn-primary">Edit</a>
+                                        <a href="{{ route('quizzes.edit', $quiz->id) }}" class="btn btn-primary m-1 p-2"><i class="fas fa-edit"></i></a>
                                         <form action="{{ route('quizzes.destroy', $quiz->id) }}" method="POST" style="display: inline-block">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                            <button type="submit" class="btn btn-danger m-1 p-2" onclick="return confirm('Are you sure you want to delete this user?')"><i class="fas fa-trash-alt"></i></button>
                                         </form>
                                     </td>
                                 </tr>

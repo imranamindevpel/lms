@@ -16,7 +16,6 @@
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
-<input type="hidden" id="studentStatus" value="{{$studentStatus}}">
 {{-- <form action="{{ route('quizzes.clock_in_out') }}" method="POST">
 <div class="row">
     @csrf
@@ -35,8 +34,6 @@
                 </h4>
                 @foreach ($courses as $course)
                 <h4 class="bg-dark text-white p-2">{{ $course->name }} Course</h4>
-                @foreach ($course->reports as $report)
-                @if($report->user_id === auth()->user()->id )
                 <table class="table table-striped table-bordered dt-responsive nowrap datatable" style="border-collapse: collapse; width: 100%;">
                     <thead>
                         <tr>
@@ -45,15 +42,15 @@
                             <th>Clock Out</th>
                             <th>Obtained Marks</th>
                             <th>Total Marks</th>
-                            <th>Action</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if($report->clock_in)
+                        @foreach ($course->reports as $report)
+                        @if($report->user_id === auth()->user()->id )
                             <tr>
                                 <td>
-                                    {{ \Carbon\Carbon::parse($report->clock_in)->format('d-m-Y') }} / 
-                                    {{ \Carbon\Carbon::parse($report->clock_out)->format('d-m-Y') }}
+                                    {{ \Carbon\Carbon::parse($report->quiz_date)->format('d-m-Y') }}
                                 </td>
                                 <td>
                                     @if($report->clock_in)
@@ -68,14 +65,27 @@
                                 <td>{{$report->obtained_marks}}</td>
                                 <td>{{$report->total_marks}}</td>
                                 <td>
-                                    <a href="{{ route('quizzes.start_quiz', $report->id) }}" class="btn btn-success">View</a>
+                                    @if ($report->status === 0)
+                                        <span class="text-danger"><strong>Fail</strong></span>
+                                    @elseif ($report->status === 1)
+                                        <span class="text-success"><strong>Pass</strong></span>
+                                    @else
+                                        @if(\Carbon\Carbon::parse($report->quiz_date)->format('d-m-Y') >= \Carbon\Carbon::now())
+                                        <a href="{{ route('quizzes.start_quiz', $report->id) }}" class="btn btn-secondary">
+                                            <strong>Start Quiz</strong>
+                                        </a>
+                                        @else
+                                        <a href="#" class="btn btn-danger">
+                                            <strong>Quiz Date ({{\Carbon\Carbon::parse($report->quiz_date)->format('d-m-Y')}})</strong>
+                                        </a>
+                                        @endif
+                                    @endif
                                 </td>
                             </tr>
-                            @endif
+                        @endif
+                        @endforeach
                     </tbody>
                 </table>
-                @endif
-                @endforeach
                 @endforeach
             </div>
         </div>
@@ -90,49 +100,4 @@
   font-weight: bold;
 }
 </style>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var studentStatus = document.getElementById("studentStatus").value;
-        var clockInBtn = document.getElementById("clock_in");
-        var startBreakBtn = document.getElementById("start_break");
-        var endBreakBtn = document.getElementById("end_break");
-        var clockOutBtn = document.getElementById("clock_out");
-        startBreakBtn.disabled = true;
-        endBreakBtn.disabled = true;
-        clockOutBtn.disabled = true;
-        // alert(studentStatus);
-        switch (studentStatus) {
-            case "userNoQuiz":
-                clockInBtn.disabled = true;
-                startBreakBtn.disabled = true;
-                endBreakBtn.disabled = true;
-                clockOutBtn.disabled = true;
-                break;
-            case "userClockedIn":
-                clockInBtn.disabled = true;
-                startBreakBtn.disabled = false;
-                endBreakBtn.disabled = true;
-                clockOutBtn.disabled = false;
-                break;
-            case "userStartedBreak":
-                clockInBtn.disabled = true;
-                startBreakBtn.disabled = true;
-                endBreakBtn.disabled = false;
-                clockOutBtn.disabled = true;
-                break;
-            case "userEndedBreak":
-                clockInBtn.disabled = true;
-                startBreakBtn.disabled = false;
-                endBreakBtn.disabled = true;
-                clockOutBtn.disabled = false;
-                break;
-            case "userClockedOut":
-                clockInBtn.disabled = true;
-                startBreakBtn.disabled = true;
-                endBreakBtn.disabled = true;
-                clockOutBtn.disabled = true;
-                break;
-        }
-    });
-</script>
 @endsection

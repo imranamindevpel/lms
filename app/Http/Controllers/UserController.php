@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Course;
 use App\Models\UserCourse;
+use App\Models\Report;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -49,9 +50,19 @@ class UserController extends Controller
         $user->password = bcrypt($request->input('password'));
         $user->role = $request->input('role');
         $user->save();
-        $createdPermission = $this->lectureFolderPermission($user, $courseIds, $email);
-        if($createdPermission){
-            return redirect()->route('users.index')->with('success', 'User created successfully.');
+        // Saving User's Courses and Assiging Quiz
+        $folders = Course::whereIn('id', $courseIds)->get();
+        $foldersArray = $folders->toArray();
+        foreach ($foldersArray as $key => $folder) {
+            $userCourse = new UserCourse();
+            $userCourse->user_id = $user->id;
+            $userCourse->course_id = $courseIds[$key];
+            $userCourse->save();
+            $userQuiz = new Report();
+            $userQuiz->user_id = $user->id;
+            $userQuiz->course_id = $courseIds[$key];
+            $userQuiz->quiz_date = $quizDate;
+            $userQuiz->save();
         }
     }
 
@@ -90,7 +101,20 @@ class UserController extends Controller
         $courseIds = $request->input('course_ids');
         
         if (isset($courseIds) && $courseIds[0] !== null) {
-            $user->courses()->attach($courseIds);
+            // Saving User's Courses and Assiging Quiz
+            $folders = Course::whereIn('id', $courseIds)->get();
+            $foldersArray = $folders->toArray();
+            foreach ($foldersArray as $key => $folder) {
+                $userCourse = new UserCourse();
+                $userCourse->user_id = $user->id;
+                $userCourse->course_id = $courseIds[$key];
+                $userCourse->save();
+                $userQuiz = new Report();
+                $userQuiz->user_id = $user->id;
+                $userQuiz->course_id = $courseIds[$key];
+                $userQuiz->quiz_date = $request->input('quiz_date');
+                $userQuiz->save();
+            }
         } else {
             return back()->withErrors('No courses selected.');
         }
@@ -103,32 +127,5 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
-    }
-    private function lectureFolderPermission($user, $courseIds, $email)
-    {
-        $folderIds = Course::whereIn('id', $courseIds)->pluck('folder_id');
-        $folderIdsArray = $folderIds->toArray();
-
-        foreach ($folderIdsArray as $key => $folderId) {
-            $client = new \Google_Client();
-            $client->setAuthConfig('../app/client_secret.json');
-            $client->refreshToken(env('GOOGLE_DRIVE_TOKEN'));
-            $client->setScopes(\Google_Service_Drive::DRIVE);
-            $client->setAccessType('offline');
-            $service = new \Google_Service_Drive($client);
-            $permission = new \Google_Service_Drive_Permission(array(
-                'type' => 'user',
-                'role' => 'reader',
-                'emailAddress' => $email,
-            ));
-            $createdPermission = $service->permissions->create($folderId, $permission);
-            $permissionId = $createdPermission->getId();
-            
-            $userCourse = new UserCourse();
-            $userCourse->user_id = $user->id;
-            $userCourse->course_id = $courseIds[$key];
-            $userCourse->permission_id = $permissionId;
-            $userCourse->save();
-        }
     }
 }

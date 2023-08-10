@@ -26,7 +26,7 @@
                 <h4 class="m-b-30 m-t-0">
                     Users
                     @if(auth()->check() && (auth()->user()->role === 'admin'))
-                    <a href="{{ route('users.create') }}" class="btn btn-secondary waves-effect waves-light float-right">
+                    <a href="{{ route('users.create') }}" class="btn btn-secondary waves-effect waves-light float-right mb-2">
                         Add User
                     </a>
                     @endif
@@ -40,7 +40,7 @@
                             <th>Email</th>
                             <th>Role</th>
                             <th>Courses</th>
-                            <th>Created At</th>
+                            <th>Quiz Date</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -56,13 +56,19 @@
                                     {{ $course->name }}<br>
                                 @endforeach
                             </td>
-                            <td>{{ $user->created_at }}</td>
                             <td>
-                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">Edit</a>
+                                @if($user->reports)
+                                @foreach($user->reports as $report)
+                                {{ $report->quiz_date }}
+                                @endforeach
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary"><i class="fas fa-edit"></i></a>
                                 <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline-block">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?')"><i class="fas fa-trash-alt"></i></button>
                                 </form>
                             </td>
                         </tr>

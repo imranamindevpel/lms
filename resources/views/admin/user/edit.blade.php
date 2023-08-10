@@ -92,6 +92,10 @@
                                 </div>
                             </div>--}}
                             <div class="form-group">
+                                <label>Quiz Date</label>
+                                <input type="date" class="form-control" name="quiz_date" value="{{ $user->quiz_date }}" required placeholder="Enter Quiz Date"/>
+                            </div>
+                            <div class="form-group">
                                 <div>
                                     <button type="submit" class="btn btn-primary waves-effect waves-light">
                                         Update

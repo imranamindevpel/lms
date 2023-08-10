@@ -178,7 +178,28 @@ class QuizController extends Controller
                 $numCorrectAnswers++;
             }
         }
-        $message = "You scored $reportId out of " . count($questionIds) . " attempted questions from Total ".env('MCQ_COUNT')." Questions!";
+        $halfMCQCount = intval(env('MCQ_COUNT')) / 2;
+        $status = ($numCorrectAnswers >= $halfMCQCount) ? 1 : 0;
+
+        $report = Report::find($reportId);
+        $report->quiz_date = Carbon::now();
+        $report->clock_in = Carbon::now();
+        $report->clock_out = Carbon::now();
+        $report->obtained_marks = $numCorrectAnswers;
+        $report->total_marks = env('MCQ_COUNT');
+        $report->status = $status;
+        $report->save();
+
+        $now = Carbon::now();
+        $nextDate = $now->copy()->addDays(env('QUIZ_AFTER_DAYS'));
+        if($status == 0){
+            $userQuiz = new Report();
+            $userQuiz->user_id = $report->user_id;
+            $userQuiz->course_id = $report->course_id;
+            $userQuiz->quiz_date = $nextDate;
+            $userQuiz->save();
+        }
+        $message = "You scored $numCorrectAnswers out of " . count($questionIds) . " attempted questions from Total ".env('MCQ_COUNT')." Questions!";
         $request->session()->flash('success', $message);
         return redirect('/dashboard');
     }
@@ -186,142 +207,5 @@ class QuizController extends Controller
         $course = Course::findOrFail($request['id']);
         $users = $course->users()->where('role', 'student')->get();
         return response()->json($users);
-    }
-    public function handleUpload(Request $request)
-    {
-        $request->validate([
-            'course_id' => 'required',
-            'csv_file' => 'required|mimes:csv,txt',
-        ]);
-        
-        $nonExistingUsers = [];
-        $courseId = $request['course_id'];
-        $user = auth()->user();
-        // Getting all existing users of Teacher Specific Course
-        $users = User::whereHas('courses', function ($query) use ($courseId) {
-            $query->where('course_id', $courseId);
-        })
-        ->where('role', 'student')
-        ->get();
-        // Getting all existing users of Teacher Specific Course
-        $userIds = $users->pluck('id')->toArray();
-        if (empty($userIds)) {
-            return redirect()->back()->with('error', "No Users Exist Against this course");
-        }
-        
-        $csv = Reader::createFromPath($request->file('csv_file')->getPathname());
-        $csv->setHeaderOffset(0);
-        
-        foreach ($csv as $row) {
-            if (!in_array($row['user_id'], $userIds)) {
-                $nonExistingUsers[] = $row['user_id'];
-                continue;
-            }
-            $quiz = new Quiz();
-            $quiz->user_id = $row['user_id'];
-            $quiz->quiz_date = $row['quiz_date'];
-            $quiz->start_time = $row['start_time'];
-            $quiz->finish_time = $row['finish_time'];
-            $quiz->total_marks = $row['total_marks'];
-            $quiz->created_at = now();
-            $quiz->updated_at = now();
-            $quiz->save();
-        }
-        if (!empty($nonExistingUsers)) {
-            $course = Course::find($courseId);
-            return redirect()->back()->with('error', 'These IDs do not exist in ' . $course->name . ' course: ' . implode(', ', $nonExistingUsers));
-        }
-        return redirect()->back()->with('success', 'CSV file imported successfully.');
-    }
-
-    public function clock_in_out(Request $request){
-        $currentTime = Carbon::now()->toDateString();
-        $loggedInUserId = auth()->user()->id;
-        
-        if ($request->has('clock_in')) {
-            $quiz = Quiz::where('quiz_date', $currentTime)->where('user_id', $loggedInUserId)
-                            ->update(['clock_in' => Carbon::now()]);
-                            // log against this user's action
-                            $user = auth()->user();
-                            $logData = [
-                                'event' => 'User Clock-In',
-                                'user_id' => $loggedInUserId,
-                                'who' => $user->name,
-                                'when' => Carbon::now(),
-                                'where' => 'QuizController@clock_in_out',
-                                'how' => 'HTTP POST Request',
-                                'created_at' => Carbon::now(),
-                                'updated_at' => Carbon::now(),
-                            ];
-                            $log = Log::create($logData);
-                            return redirect()->back()->with('success', 'Your Quiz is Started');
-            
-        } elseif ($request->has('clock_out')) {
-            $quiz = Quiz::where('quiz_date', $currentTime)->where('user_id', $loggedInUserId)
-                            ->whereNotNull('clock_in')->whereNull('clock_out')
-                            ->update(['clock_out' => Carbon::now()]);
-                            // log against this user's action
-                            $user = auth()->user();
-                            $logData = [
-                                'event' => 'User Clock-Out',
-                                'user_id' => $loggedInUserId,
-                                'who' => $user->name,
-                                'when' => Carbon::now(),
-                                'where' => 'QuizController@clock_in_out',
-                                'how' => 'HTTP POST Request',
-                                'created_at' => Carbon::now(),
-                                'updated_at' => Carbon::now(),
-                            ];
-                            $log = Log::create($logData);
-                            return redirect()->back()->with('success', 'Your Quiz is Ended');
-
-        } elseif ($request->has('start_break')) {
-            $quizId = Quiz::where('user_id', $loggedInUserId)
-                            ->whereNotNull('clock_in')->whereNull('clock_out')
-                            ->value('id');
-            $quizBreak = new QuizBreaks();
-            $quizBreak->quiz_id = $quizId;
-            $quizBreak->start_break = Carbon::now();
-            $quizBreak->created_at = now();
-            $quizBreak->updated_at = now();
-            $quizBreak->save();
-            // log against this user's action
-            $user = auth()->user();
-            $logData = [
-                'event' => 'User Start Break',
-                'user_id' => $loggedInUserId,
-                'who' => $user->name,
-                'when' => Carbon::now(),
-                'where' => 'QuizController@clock_in_out',
-                'how' => 'HTTP POST Request',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ];
-            $log = Log::create($logData);
-            return redirect()->back()->with('success', 'Your Break is Started');
-
-        } elseif ($request->has('end_break')) {
-            $quizId = Quiz::where('user_id', $loggedInUserId)
-                            ->whereNotNull('clock_in')->whereNull('clock_out')
-                            ->value('id');
-            $quizBreaks = QuizBreaks::where('quiz_id', $quizId)
-                            ->whereNotNull('start_break')->whereNull('end_break')
-                            ->update(['end_break' => Carbon::now()]);
-                            // log against this user's action
-                            $user = auth()->user();
-                            $logData = [
-                                'event' => 'User End Break',
-                                'user_id' => $loggedInUserId,
-                                'who' => $user->name,
-                                'when' => Carbon::now(),
-                                'where' => 'QuizController@clock_in_out',
-                                'how' => 'HTTP POST Request',
-                                'created_at' => Carbon::now(),
-                                'updated_at' => Carbon::now(),
-                            ];
-                            $log = Log::create($logData);
-                            return redirect()->back()->with('success', 'Your Break is Ended');
-        }
-        dd("There is no quiz for today.");
     }
 }
